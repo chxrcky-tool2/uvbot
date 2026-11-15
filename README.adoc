@@ -1,3 +1,6 @@
+Note! This is a fork of uvBot, specifically targeting Geode SDK v6.0.0-alpha.1 and Geometry Dash 2.2091. Compiled on a
+mobile phone, Android64.
+
 image::logo.png[uvBot logo,200]
 
 
@@ -80,3 +83,4 @@ create a fork, however, none of them will be accepted into upstream.
 * @tobyadd for GDH for a _lot_ of stuff (`grep -rn "// Thanks toby" src/ | wc -l`)
 * @cvolton for Various Bugfixes from which both the hitboxes mirror fix
   and the hitbox physics fix were taken
+* The creator of uvBot for having a public license.
