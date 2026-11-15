@@ -6,7 +6,12 @@
 
 #include <Geode/Geode.hpp>
 
+#if defined(GEODE_IS_WINDOWS) || defined(GEODE_IS_MACOS)
 #include <Geode/modify/CCEGLView.hpp>
+#else
+#include <Geode/modify/UILayer.hpp>
+#include <Geode/modify/PauseLayer.hpp>
+#endif
 
 #include "key_to_string.hh"
 
@@ -42,20 +47,22 @@ namespace uv::gui {
         .excess_render = 3.0f,
         .codec = "libx264",
         .bitrate = "50M",
-        .output_path = geode::utils::string::pathToString(uv::showcase_path / ".mp4"),
+        .output_path = uv::path_str(uv::showcase_path / ".mp4"),
         .custom_options = "-pix_fmt yuv420p -vf \"vflip\"",
         .hide_end_level_screen = true,
         .fade_out = false,
     };
     
     uv::recorder::audio::options audio_opts = {
-        .output_path = geode::utils::string::pathToString(uv::showcase_path / ".wav"),
+        .output_path = uv::path_str(uv::showcase_path / ".wav"),
         .music_volume = 1.0f,
         .sfx_volume = 1.0f,
         .excess_render = 3.0f,
    };
     
-    static const std::filesystem::path ffmpeg_path = geode::dirs::getGameDir() / "ffmpeg.exe";
+#ifdef GEODE_IS_WINDOWS
+    static const std::filesystem::path ffmpeg_path = uv::std_path(geode::dirs::getGameDir()) / "ffmpeg.exe";
+#endif
 
     void setup(void) {
         ImGuiIO &io = ImGui::GetIO();
@@ -64,7 +71,7 @@ namespace uv::gui {
         // OpenSans font
         // https://fonts.google.com/specimen/Open+Sans
         
-        io.Fonts->AddFontFromFileTTF(geode::utils::string::pathToString(geode::Mod::get()->getResourcesDir() / "OpenSans-Regular.ttf").c_str(), 22.0f);
+        io.Fonts->AddFontFromFileTTF(uv::path_str(uv::std_path(geode::Mod::get()->getResourcesDir()) / "OpenSans-Regular.ttf").c_str(), 22.0f);
         
         // Windark style by DestroyerDarkNess from ImThemes
         // And some small changes
@@ -223,7 +230,7 @@ namespace uv::gui {
                 
                 ImGui::Spacing();
                 
-                if (ImGui::Button("Open Macros folder", { ImGui::GetContentRegionAvail().x, 0 })) geode::utils::file::openFolder(uv::macro_path);
+                if (ImGui::Button("Open Macros folder", { ImGui::GetContentRegionAvail().x, 0 })) uv::open_folder(uv::macro_path);
 
                 ImGui::SeparatorText("Macros");
 
@@ -232,10 +239,10 @@ namespace uv::gui {
                 uv::bot::foreign::error load_error = uv::bot::foreign::error::none;
                 for (auto const &dir_entry : std::filesystem::directory_iterator(uv::macro_path, error)) {
                     not_empty = true; // I am too lazy to do this the right way
-                    std::string dir_str = geode::utils::string::pathToString(dir_entry.path());
+                    std::string dir_str = uv::path_str(dir_entry.path());
                     if (dir_entry.is_regular_file()) {
                         if (dir_str.ends_with(".uv")) {
-                            std::string path = geode::utils::string::pathToString(dir_entry.path());
+                            std::string path = uv::path_str(dir_entry.path());
                             int from = path.rfind(dir_entry.path().preferred_separator);
                             if (from == std::string::npos) from = 0;
                             std::string name = path.substr(from + 1, path.size() - from - 4);
@@ -246,7 +253,7 @@ namespace uv::gui {
                         } else {
                             for (auto &i : uv::bot::foreign::supported_exts) {
                                 if (dir_str.ends_with(i)) {
-                                    std::string path = geode::utils::string::pathToString(dir_entry.path());
+                                    std::string path = uv::path_str(dir_entry.path());
                                     int from = path.rfind(dir_entry.path().preferred_separator);
                                     if (from == std::string::npos) from = 0;
                                     std::string name = path.substr(from + 1, path.size() - from - 1);
@@ -459,6 +466,7 @@ namespace uv::gui {
                 ImGui::EndTabItem();
             }
 
+#ifdef GEODE_IS_WINDOWS
             if (ImGui::BeginTabItem("Recorder")) {
                 std::error_code error;
                 if (!std::filesystem::is_regular_file(ffmpeg_path, error) || !std::filesystem::exists(ffmpeg_path, error)) {
@@ -466,14 +474,14 @@ namespace uv::gui {
                     ImGui::Text("For the internal recorder feature to work, you need to copy ffmpeg.exe to Geometry Dash installation path.");
                     
                     ImGui::Dummy(ImVec2(0, ImGui::GetWindowSize().y - ImGui::GetCursorPosY() - ImGui::GetTextLineHeight() - ImGui::GetStyle().FramePadding.y * 2.0f - ImGui::GetStyle().WindowPadding.y * 2));
-                    if (ImGui::Button("Open GD folder", { ImGui::GetContentRegionAvail().x, 0 })) geode::utils::file::openFolder(geode::dirs::getGameDir());
+                    if (ImGui::Button("Open GD folder", { ImGui::GetContentRegionAvail().x, 0 })) uv::open_folder(uv::std_path(geode::dirs::getGameDir()));
                     ImGui::PopTextWrapPos();
                 } else {
                     if (ImGui::BeginTabBar("uvBot Recorder Sub-TabBar")) {
                         if (ImGui::BeginTabItem("Video")) {
                             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                             if (ImGui::InputTextWithHint("##Video Filename", "Video Filename (e.g. file.mp4)", &video_name)) {
-                                render_opts.output_path = geode::utils::string::pathToString(uv::showcase_path / video_name);
+                                render_opts.output_path = uv::path_str(uv::showcase_path / video_name);
                             }
 
                             // This is probably too overengineered but I don't care
@@ -540,7 +548,7 @@ namespace uv::gui {
                             
                             ImGui::Spacing();
                             
-                            if (ImGui::Button("Open Showcases folder", { ImGui::GetContentRegionAvail().x, 0 })) geode::utils::file::openFolder(uv::showcase_path);
+                            if (ImGui::Button("Open Showcases folder", { ImGui::GetContentRegionAvail().x, 0 })) uv::open_folder(uv::showcase_path);
 
                             space_without_text = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 3) / 4;
 
@@ -592,7 +600,7 @@ namespace uv::gui {
                         if (ImGui::BeginTabItem("Audio")) {
                             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                             if (ImGui::InputTextWithHint("##Audio Filename", "Audio Filename (e.g. file.wav)", &audio_name)) {
-                                audio_opts.output_path = geode::utils::string::pathToString(uv::showcase_path / audio_name);
+                                audio_opts.output_path = uv::path_str(uv::showcase_path / audio_name);
                             }
 
                             ImGui::Spacing();
@@ -605,7 +613,7 @@ namespace uv::gui {
                             
                             ImGui::Spacing();
                             
-                            if (ImGui::Button("Open Showcases folder", { ImGui::GetContentRegionAvail().x, 0 })) geode::utils::file::openFolder(uv::showcase_path);
+                            if (ImGui::Button("Open Showcases folder", { ImGui::GetContentRegionAvail().x, 0 })) uv::open_folder(uv::showcase_path);
 
                             ImGui::Dummy(ImVec2(0, ImGui::GetWindowSize().y - ImGui::GetCursorPosY() - ImGui::GetTextLineHeight() - ImGui::GetStyle().FramePadding.y * 2.0f - ImGui::GetStyle().WindowPadding.y * 2));
                             
@@ -638,17 +646,17 @@ namespace uv::gui {
                             
                             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                             if (ImGui::InputTextWithHint("##Merge Video Filename", "Video Filename (e.g. file.mp4)", &merge_video_name)) {
-                                merge_video_path = geode::utils::string::pathToString(uv::showcase_path / merge_video_name);
+                                merge_video_path = uv::path_str(uv::showcase_path / merge_video_name);
                             }
                             
                             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                             if (ImGui::InputTextWithHint("##Merge Audio Filename", "Audio Filename (e.g. file.wav)", &merge_audio_name)) {
-                                merge_audio_path = geode::utils::string::pathToString(uv::showcase_path / merge_audio_name);
+                                merge_audio_path = uv::path_str(uv::showcase_path / merge_audio_name);
                             }
                             
                             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
                             if (ImGui::InputTextWithHint("##Merge Output Filename", "Output Filename (e.g. file +music.mp4)", &merge_output_name)) {
-                                merge_output_path = geode::utils::string::pathToString(uv::showcase_path / merge_output_name);
+                                merge_output_path = uv::path_str(uv::showcase_path / merge_output_name);
                             }
                             
                             ImGui::Spacing();
@@ -658,7 +666,7 @@ namespace uv::gui {
                            
                             ImGui::Spacing();
                             
-                            if (ImGui::Button("Open Showcases folder", { ImGui::GetContentRegionAvail().x, 0 })) geode::utils::file::openFolder(uv::showcase_path);
+                            if (ImGui::Button("Open Showcases folder", { ImGui::GetContentRegionAvail().x, 0 })) uv::open_folder(uv::showcase_path);
 
                             ImGui::Dummy(ImVec2(0, ImGui::GetWindowSize().y - ImGui::GetCursorPosY() - ImGui::GetTextLineHeight() - ImGui::GetStyle().FramePadding.y * 2.0f - ImGui::GetStyle().WindowPadding.y * 2));
 
@@ -703,7 +711,7 @@ namespace uv::gui {
                            
                             ImGui::Spacing();
                             
-                            if (ImGui::Button("Open Showcases folder", { ImGui::GetContentRegionAvail().x, 0 })) geode::utils::file::openFolder(uv::showcase_path);
+                            if (ImGui::Button("Open Showcases folder", { ImGui::GetContentRegionAvail().x, 0 })) uv::open_folder(uv::showcase_path);
 
                             #define replace(s, h, n) do { \
                                 pos = (s).find((h)); \
@@ -713,7 +721,7 @@ namespace uv::gui {
                             if (ImGui::Button("Run", { ImGui::GetContentRegionAvail().x, 0 })) {
                                 std::string args = raw_arguments;
                                 size_t pos;
-                                replace(args, "{showcases}", geode::utils::string::pathToString(uv::showcase_path));
+                                replace(args, "{showcases}", uv::path_str(uv::showcase_path));
                                 replace(args, "\n", " ");
                                 uv::recorder::raw(args);
                             }
@@ -730,7 +738,17 @@ namespace uv::gui {
                 ImGui::EndTabItem();
             }
 
+#else
+            if (ImGui::BeginTabItem("Recorder")) {
+                ImGui::PushTextWrapPos(0.0f);
+                ImGui::Text("The internal recorder needs ffmpeg.exe, so it is only available on Windows.");
+                ImGui::PopTextWrapPos();
+                ImGui::EndTabItem();
+            }
+#endif
+
             if (ImGui::BeginTabItem("Settings")) {
+#if defined(GEODE_IS_WINDOWS) || defined(GEODE_IS_MACOS)
                 ImGui::SeparatorText("Menu Keybind");
 
                 ImGui::Dummy(ImVec2(0, ImGui::GetFrameHeight() - ImGui::GetTextLineHeightWithSpacing()));
@@ -768,6 +786,17 @@ namespace uv::gui {
                 ImGui::SameLine();
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetFrameHeight() + ImGui::GetTextLineHeightWithSpacing());
                 keycode_selector("frame-stepper-step-keybind", GLFW_KEY_V);
+#else
+                ImGui::SeparatorText("Menu Button");
+                ImGui::PushTextWrapPos(0.0f);
+                ImGui::Text("Tap the uv button in the top right corner while playing or on the pause menu to open or close this menu.");
+                ImGui::PopTextWrapPos();
+
+                ImGui::SeparatorText("Frame Stepper");
+                bool frame_stepper_on = uv::hacks::frame_stepper::on;
+                if (ImGui::Checkbox("Enabled", &frame_stepper_on)) uv::hacks::frame_stepper::on = frame_stepper_on;
+                if (ImGui::Button("Step 1 frame", { ImGui::GetContentRegionAvail().x, 0 })) uv::hacks::frame_stepper::step_for++;
+#endif
                 
                 ImGui::EndTabItem();
             }
@@ -873,6 +902,7 @@ namespace uv::gui {
     }
 }
 
+#if defined(GEODE_IS_WINDOWS) || defined(GEODE_IS_MACOS)
 class $modify(cocos2d::CCEGLView) {
     void onGLFWKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
         CCEGLView::onGLFWKeyCallback(window, key, scancode, action, mods);
@@ -892,3 +922,51 @@ class $modify(cocos2d::CCEGLView) {
         }
     }
 };
+#else
+namespace uv::gui {
+    static void toggle_menu(void) {
+        toggle_time = std::chrono::steady_clock::now();
+        show = !show;
+    }
+
+    static cocos2d::CCMenu *make_menu_button(cocos2d::CCNode *parent, cocos2d::CCObject *target, cocos2d::SEL_MenuHandler handler) {
+        cocos2d::CCLabelBMFont *label = cocos2d::CCLabelBMFont::create("uv", "bigFont.fnt");
+        label->setScale(0.6f);
+        label->setOpacity(190);
+
+        CCMenuItemSpriteExtra *button = CCMenuItemSpriteExtra::create(label, target, handler);
+
+        cocos2d::CCMenu *menu = cocos2d::CCMenu::create();
+        menu->addChild(button);
+
+        cocos2d::CCSize win = cocos2d::CCDirector::get()->getWinSize();
+        menu->setPosition({ win.width - 28.0f, win.height - 24.0f });
+        menu->setZOrder(1000);
+        parent->addChild(menu);
+        return menu;
+    }
+}
+
+class $modify(UVUILayer, UILayer) {
+    bool init(GJBaseGameLayer *p0) {
+        if (!UILayer::init(p0)) return false;
+        uv::gui::make_menu_button(this, this, menu_selector(UVUILayer::on_uv));
+        return true;
+    }
+
+    void on_uv(cocos2d::CCObject*) {
+        uv::gui::toggle_menu();
+    }
+};
+
+class $modify(UVPauseLayer, PauseLayer) {
+    void customSetup(void) {
+        PauseLayer::customSetup();
+        uv::gui::make_menu_button(this, this, menu_selector(UVPauseLayer::on_uv));
+    }
+
+    void on_uv(cocos2d::CCObject*) {
+        uv::gui::toggle_menu();
+    }
+};
+#endif

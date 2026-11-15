@@ -1,12 +1,44 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
+#include <cmath>
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <map>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <type_traits>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 #include <Geode/Geode.hpp>
 
+#include <asp/fs/std.hpp>
+
 namespace uv {
-    const std::filesystem::path macro_path = geode::Mod::get()->getSaveDir() / "Macros";
-    const std::filesystem::path showcase_path = geode::Mod::get()->getSaveDir() / "Showcases";
+    inline std::filesystem::path std_path(std::filesystem::path p) {
+        return p;
+    }
+
+    inline std::filesystem::path std_path(asp::fs::Path const &p) {
+        return p.toStdPath();
+    }
+
+    inline std::string path_str(std::filesystem::path const &p) {
+        auto s = p.u8string();
+        return std::string(reinterpret_cast<const char*>(s.data()), s.size());
+    }
+
+    inline void open_folder(std::filesystem::path const &p) {
+        geode::utils::file::openFolder(asp::fs::Path::fromStdPath(p));
+    }
+
+    const std::filesystem::path macro_path = std_path(geode::Mod::get()->getSaveDir()) / "Macros";
+    const std::filesystem::path showcase_path = std_path(geode::Mod::get()->getSaveDir()) / "Showcases";
     extern std::vector<std::string> installed_conflict_mods;
     
     namespace gui {
@@ -140,7 +172,7 @@ namespace uv {
         struct checkpoint_data {
             double rotation;
             // Copied directly from Geode bindings
-            // https://github.com/geode-sdk/bindings/blob/main/bindings/2.2074/GeometryDash.bro#L18490
+            // https://github.com/geode-sdk/bindings/blob/main/bindings/2.2091/GeometryDash.bro
             cocos2d::CCNode* m_mainLayer;
             bool m_wasTeleported;
             bool m_fixGravityBug;
@@ -191,8 +223,8 @@ namespace uv {
             bool m_slopeFlipGravityRelated;
             cocos2d::CCArray* m_particleSystems;
             float m_slopeAngleRadians;
-            gd::unordered_map<int, GJPointDouble> m_rotateObjectsRelated;
-            gd::unordered_map<int, GameObject*> m_maybeRotatedObjectsMap;
+            std::unordered_map<int, GJPointDouble> m_rotateObjectsRelated;
+            std::unordered_map<int, GameObject*> m_maybeRotatedObjectsMap;
             float m_rotationSpeed;
             float m_rotateSpeed;
             bool m_isRotating;
@@ -249,7 +281,7 @@ namespace uv {
             double m_accelerationOrSpeed;
             double m_snapDistance;
             bool m_ringJumpRelated;
-            gd::unordered_set<int> m_ringRelatedSet;
+            std::unordered_set<int> m_ringRelatedSet;
             GameObject* m_objectSnappedTo;
             CheckpointObject* m_pendingCheckpoint;
             int m_onFlyCheckpointTries;
@@ -347,7 +379,7 @@ namespace uv {
             bool m_controlsDisabled;
             cocos2d::CCPoint m_lastGroundedPos;
             cocos2d::CCArray* m_touchingRings;
-            gd::unordered_set<int> m_touchedRings;
+            std::unordered_set<int> m_touchedRings;
             GameObject* m_lastActivatedPortal;
             bool m_hasEverJumped;
             bool m_hasEverHitRing;
@@ -365,7 +397,7 @@ namespace uv {
             bool m_swapColors;
             bool m_switchDashFireColor;
             int m_followRelated;
-            gd::vector<float> m_playerFollowFloats;
+            std::vector<float> m_playerFollowFloats;
             float m_unk838;
             int m_stateOnGround;
             unsigned char m_stateUnk;
@@ -408,13 +440,13 @@ namespace uv {
             int m_stateForce;
             cocos2d::CCPoint m_stateForceVector;
             bool m_affectedByForces;
-            gd::map<int, bool> m_jumpPadRelated;
+            std::map<int, bool> m_jumpPadRelated;
             float m_somethingPlayerSpeedTime;
             float m_playerSpeedAC;
             bool m_fixRobotJump;
-            gd::map<int, bool> m_holdingButtons;
+            std::map<int, bool> m_holdingButtons;
             bool m_inputsLocked;
-            gd::string m_currentRobotAnimation;
+            std::string m_currentRobotAnimation;
             bool m_gv0123;
             int m_iconRequestID;
             cocos2d::CCSpriteBatchNode* m_robotBatchNode;

@@ -12,18 +12,15 @@ $on_mod(Loaded) {
     ImGuiCocos::get().setup(uv::gui::setup).draw(uv::gui::draw);
     
     std::vector<std::filesystem::path> paths = {
-        geode::Mod::get()->getSaveDir() / "Macros",
-        geode::Mod::get()->getSaveDir() / "Showcases",
+        uv::macro_path,
+        uv::showcase_path,
     };
 
-    std::error_code error;
-
     for (auto &path : paths) {
-        if (!std::filesystem::exists(path, error) || !std::filesystem::is_directory(path, error)) {
-            if (!geode::utils::file::createDirectory(path)) {
-                geode::log::warn("Couldn't create '{}'", path);
-            }
-        }
+        std::error_code error;
+        if (std::filesystem::is_directory(path, error)) continue;
+        std::filesystem::create_directories(path, error);
+        if (error) geode::log::warn("Couldn't create '{}': {}", uv::path_str(path), error.message());
     }
     
     const std::vector<std::string> conflict_mods = {

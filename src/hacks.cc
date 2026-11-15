@@ -175,7 +175,7 @@ class $modify(PlayLayer) {
 };
 
 class $modify(GameObject) {
-    void addGlow(gd::string p0) {
+    void addGlow(std::string p0) {
         GameObject::addGlow(p0);
         if (uv::hacks::get("layout-mode", false) && this->m_objectType == GameObjectType::Decoration) this->m_isHide = true;
         if (uv::hacks::get("show-triggers", false) && this->isTrigger()) this->m_isHide = false;

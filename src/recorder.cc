@@ -1,4 +1,6 @@
+#ifdef GEODE_IS_WINDOWS
 #include <subprocess.hpp>
+#endif
 
 #include <Geode/Geode.hpp>
 
@@ -7,11 +9,14 @@
 #include <Geode/modify/CCScheduler.hpp>
 #include <Geode/modify/UILayer.hpp>
 
+#ifdef GEODE_IS_WINDOWS
 #define DR_WAV_IMPLEMENTATION
 #include <dr_wav.h>
+#endif
 
 #include "common.hh"
 
+#ifdef GEODE_IS_WINDOWS
 // Thanks matcool
 namespace uv::recorder {
     struct render_texture {
@@ -97,7 +102,7 @@ namespace uv::recorder {
 
         std::thread([&, opt]() {
             std::vector<std::string> cmd = {
-                (geode::dirs::getGameDir() / "ffmpeg.exe").string(), "-y",
+                uv::path_str(uv::std_path(geode::dirs::getGameDir()) / "ffmpeg.exe"), "-y",
                 "-f", "rawvideo", "-pix_fmt", "rgb24",
                 "-s", fmt::format("{}x{}", opt.width, opt.height),
                 "-r", std::to_string(opt.fps),
@@ -143,7 +148,7 @@ namespace uv::recorder {
 
     void merge(std::string video, std::string audio, std::string output, std::string args) {
         std::vector<std::string> cmd = {
-            (geode::dirs::getGameDir() / "ffmpeg.exe").string(), "-y",
+            uv::path_str(uv::std_path(geode::dirs::getGameDir()) / "ffmpeg.exe"), "-y",
             "-i", video, "-i", audio,
         };
         
@@ -155,7 +160,7 @@ namespace uv::recorder {
 
     void raw(std::string args) {
         std::vector<std::string> cmd = {
-            (geode::dirs::getGameDir() / "ffmpeg.exe").string(), "-y",
+            uv::path_str(uv::std_path(geode::dirs::getGameDir()) / "ffmpeg.exe"), "-y",
         };
         
         std::string command = fmt::format("\"{}\" {}", fmt::join(cmd, "\" \""), args);
@@ -277,6 +282,30 @@ namespace uv::recorder {
     }
 }
 
+#else
+namespace uv::recorder {
+    bool recording = false;
+    options recording_options;
+
+    void start(options) {}
+    void update(void) {}
+    void end(void) {}
+    void merge(std::string, std::string, std::string, std::string) {}
+    void raw(std::string) {}
+    bool process_done(void) { return true; }
+
+    namespace audio {
+        bool recording = false;
+        options recording_options;
+
+        void init(options) {}
+        void start(void) {}
+        void end(void) {}
+    }
+}
+#endif
+
+#ifdef GEODE_IS_WINDOWS
 static bool level_ended = false;
 static bool started_audio_render = false;
 static std::chrono::steady_clock::time_point level_end_point;
@@ -373,6 +402,8 @@ class $modify(GJBaseGameLayer) {
     }
 };
 
+#endif
+
 class $modify(cocos2d::CCScheduler) {
     void update(float dt) {
         if (uv::recorder::recording) {
@@ -383,6 +414,7 @@ class $modify(cocos2d::CCScheduler) {
     }
 };
 
+#ifdef GEODE_IS_WINDOWS
 // Thanks toby
 class $modify(UILayer) {
     bool init(GJBaseGameLayer *p0) {
@@ -398,3 +430,4 @@ class $modify(UILayer) {
         return true;
     }
 };
+#endif

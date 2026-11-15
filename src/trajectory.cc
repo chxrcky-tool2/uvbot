@@ -196,7 +196,7 @@ class $modify(GJBaseGameLayer) {
         } */
     }
     
-    void collisionCheckObjects(PlayerObject *p0, gd::vector<GameObject*> *objects, int p2, float p3) {
+    void collisionCheckObjects(PlayerObject *p0, std::vector<GameObject*> *objects, int p2, float p3) {
         if (uv::hacks::trajectory::making_trajectory) {
             std::vector<GameObject*> to_reenable;
 
