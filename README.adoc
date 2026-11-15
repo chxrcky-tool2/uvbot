@@ -6,17 +6,18 @@ image::logo.png[uvBot logo,200]
 
 = uvBot
 A free and open source TAS tool for Geometry Dash
+i love uvBot
 
-WARNING: You are kinda early. This is still in heavy development
+WARNING: You are kind. and This person reading is important, handsome, and cute
 
 Features include:
 
-* Good accuracy (Hardest recorded level by me is Flamewall I think?)
-* Standalone-ness (You don't need an additional mod menu to use this bot efficiently)
+* Good accuracy (Hardest recorded level by me ( not chxrcky-tool2 ) is Flamewall I think?)
+* Standalone-ness (btw, this is not standalone, it needs FFmpeg.exe for internal renderer/recording, which means it needs dependencies if you wanna use renderer)
 * Internal Recorder
 
 == Quickstart
-Compile it, download from https://github.com/thisisignitedoreo/uvbot/actions[Actions] or from https://github.com/thisisignitedoreo/uvbot/releases[Releases]
+Compile it, download from https://github.com/thisisignitedoreo/uvbot/releases[Releases]
 
 == `.uv` format
 The file format is as follows:
@@ -62,25 +63,26 @@ struct replay {
 ----
 
 == Contributions
-This project is *Open Source*, however, it is not *Open Contribution*.
-Any pull request created will be closed. Issues, however, are welcome.
+This project is *Open Source*, however, it is *Open Contribution*.
+Any pull request created will be opened, and try. Issues, however, are welcome.
 
 The reason is simple - I want to have all the control over the codebase,
 so a bad reviewed PR won't break the bot or introduce some kind of
 undebuggable bug.
 
 If you want to have a version with your modifications - feel free to
-create a fork, however, none of them will be accepted into upstream.
+create a fork, ill accept your push (if windows) and upstream. Make sure to record your fork of uvBot of Chxrcky-tool2, by using windows not android64.
 
 == Links
 
-* https://discord.gg/GmRDUKRqE8[Discord Server]
+* https://discord.gg/GmRDUKRqE8 [Discord Server] Nice discord server btw! I left now
 
 == Thanks to
 
 * @matcool for ReplayBot, from which both the `subprocess.hpp` header
-  and recorder implementation was taken
+  and recorder implementation was taken. Nice MatCool! youre really cool based on your name!
 * @tobyadd for GDH for a _lot_ of stuff (`grep -rn "// Thanks toby" src/ | wc -l`)
+And nice TobyAdd for GDH, it is W mod!
 * @cvolton for Various Bugfixes from which both the hitboxes mirror fix
-  and the hitbox physics fix were taken
+  and the hitbox physics fix were taken. (Thanks for the Example-mod repo!)
 * The creator of uvBot for having a public license.
