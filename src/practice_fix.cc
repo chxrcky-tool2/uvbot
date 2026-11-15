@@ -73,24 +73,21 @@ class $modify(HookedCheckpointObject, CheckpointObject) {
     struct Fields {
         uv::practice_fix::checkpoint_data p1, p2;
     };
-
-    bool init(void) {
-        //  | This one byte of code just cost me an hour of painful debugging
-        //  v I will never get that time back
-        if (!CheckpointObject::init()) return false;
-        
-        PlayLayer *pl = PlayLayer::get();
-
-        if (pl) {
-            m_fields->p1 = uv::practice_fix::from_playerobject(pl->m_player1);
-            if (pl->m_player2) m_fields->p2 = uv::practice_fix::from_playerobject(pl->m_player2);
-        }
-        
-        return true;
-    }
 };
 
 class $modify(PlayLayer) {
+    CheckpointObject *createCheckpoint(void) {
+        CheckpointObject *cp = PlayLayer::createCheckpoint();
+
+        if (cp) {
+            HookedCheckpointObject *hooked = static_cast<HookedCheckpointObject*>(cp);
+            hooked->m_fields->p1 = uv::practice_fix::from_playerobject(this->m_player1);
+            if (this->m_player2) hooked->m_fields->p2 = uv::practice_fix::from_playerobject(this->m_player2);
+        }
+
+        return cp;
+    }
+
     void loadFromCheckpoint(CheckpointObject *cp) {
         PlayLayer::loadFromCheckpoint(cp);
 
