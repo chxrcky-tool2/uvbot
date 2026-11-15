@@ -34,9 +34,7 @@ namespace uv {
     }
 
     inline void open_folder(std::filesystem::path const &p) {
-        auto converted = asp::fs::Path::fromStdPath(p);
-        if constexpr (requires { converted.unwrapOrDefault(); }) geode::utils::file::openFolder(converted.unwrapOrDefault());
-        else geode::utils::file::openFolder(converted);
+        geode::utils::file::openFolder(asp::fs::Path::fromStdPath(p));
     }
 
     const std::filesystem::path macro_path = std_path(geode::Mod::get()->getSaveDir()) / "Macros";

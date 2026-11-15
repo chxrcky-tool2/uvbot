@@ -30,7 +30,7 @@ $on_mod(Loaded) {
 
     for (auto &mod : conflict_mods) {
         geode::Mod *modobj = geode::Loader::get()->getLoadedMod(mod);
-        if (modobj && modobj->isEnabled()) uv::installed_conflict_mods.push_back(modobj->getName());
+        if (modobj) uv::installed_conflict_mods.push_back(modobj->getName());
     }
 
     if (!uv::installed_conflict_mods.empty()) {
