@@ -831,7 +831,7 @@ namespace uv::gui {
                 if (ImGui::Button(show_style_editor ? "Hide Style Editor window" : "Show Style Editor window")) show_style_editor = !show_style_editor;
 
                 ImGui::Text("Last key pressed: %d", _last_key);
-                ImGui::Text("Frame: %d", uv::bot::get_frame());
+                ImGui::Text("Frame: %llu", static_cast<unsigned long long>(uv::bot::get_frame()));
                 
                 ImGui::EndTabItem();
             }
@@ -879,7 +879,7 @@ namespace uv::gui {
             ImGui::Text("Conflicting mods:");
             for (auto &i : uv::installed_conflict_mods) {
                 ImGui::Bullet();
-                ImGui::Text(i.c_str());
+                ImGui::TextUnformatted(i.c_str());
             }
             ImGui::PopTextWrapPos();
         }

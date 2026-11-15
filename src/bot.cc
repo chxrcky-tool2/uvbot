@@ -280,12 +280,12 @@ class $modify(GJBaseGameLayer) {
         if (uv::bot::button(down, button, isPlayer1)) GJBaseGameLayer::handleButton(down, button, isPlayer1);
     }
 
-    void processCommands(float dt) {
+    void processCommands(float dt, bool is_half_tick, bool is_last_tick) {
         if (!PlayLayer::get()) {
-            GJBaseGameLayer::processCommands(dt);
+            GJBaseGameLayer::processCommands(dt, is_half_tick, is_last_tick);
             return;
         }
-        GJBaseGameLayer::processCommands(dt);
+        GJBaseGameLayer::processCommands(dt, is_half_tick, is_last_tick);
         uv::bot::update_input(this, dt);
     }
 
