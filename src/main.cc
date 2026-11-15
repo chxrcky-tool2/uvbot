@@ -10,6 +10,7 @@ namespace uv {
 
 $on_mod(Loaded) {
     ImGuiCocos::get().setup(uv::gui::setup).draw(uv::gui::draw);
+    uv::practice_fix::log_missing_fields();
     
     std::vector<std::filesystem::path> paths = {
         uv::macro_path,
