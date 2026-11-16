@@ -8,7 +8,7 @@ else()
 endif()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-project(uvBot VERSION 1.0.0)
+project(uvBot VERSION 0.2.1)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cc)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
