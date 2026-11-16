@@ -9,7 +9,6 @@
 #if defined(GEODE_IS_WINDOWS) || defined(GEODE_IS_MACOS)
 #include <Geode/modify/CCEGLView.hpp>
 #else
-#include <Geode/modify/UILayer.hpp>
 #include <Geode/modify/PauseLayer.hpp>
 #endif
 
@@ -68,13 +67,9 @@ namespace uv::gui {
         ImGuiIO &io = ImGui::GetIO();
         ImGuiStyle &style = ImGui::GetStyle();
 
-        // OpenSans font
-        // https://fonts.google.com/specimen/Open+Sans
         
         io.Fonts->AddFontFromFileTTF(uv::path_str(uv::std_path(geode::Mod::get()->getResourcesDir()) / "OpenSans-Regular.ttf").c_str(), 22.0f);
         
-        // Windark style by DestroyerDarkNess from ImThemes
-        // And some small changes
         
         style.Alpha = 1.0f;
         style.DisabledAlpha = 0.6f;
@@ -183,7 +178,6 @@ namespace uv::gui {
     static void draw_main_ui(void) {
         if (ImGui::BeginTabBar("uvBot TabBar")) {
             if (ImGui::BeginTabItem("Bot")) {
-                // I hate C++
                 auto *state_pointer = reinterpret_cast<int*>(&uv::bot::current_state);
                 
                 bool changed_none = ImGui::RadioButton("None", state_pointer, uv::bot::state::none);
@@ -238,7 +232,7 @@ namespace uv::gui {
                 std::error_code error;
                 uv::bot::foreign::error load_error = uv::bot::foreign::error::none;
                 for (auto const &dir_entry : std::filesystem::directory_iterator(uv::macro_path, error)) {
-                    not_empty = true; // I am too lazy to do this the right way
+                    not_empty = true;
                     std::string dir_str = uv::path_str(dir_entry.path());
                     if (dir_entry.is_regular_file()) {
                         if (dir_str.ends_with(".uv")) {
@@ -434,8 +428,6 @@ namespace uv::gui {
                 checkbox_id("Layout Mode", "layout-mode", false);
                 checkbox_id("Remove Shake Triggers", "layout-mode-shake", true);
                 ImGui::Spacing();
-                // checkbox_id("Show Triggers", "show-triggers", false);
-                // ImGui::Spacing();
                 if (ImGui::ArrowButton("Layout Mode Colors Opener", lm_colors_opened ? ImGuiDir_Down : ImGuiDir_Right)) lm_colors_opened = !lm_colors_opened;
                 ImGui::SameLine();
                 ImGui::Text("Layout Mode Colors");
@@ -484,7 +476,6 @@ namespace uv::gui {
                                 render_opts.output_path = uv::path_str(uv::showcase_path / video_name);
                             }
 
-                            // This is probably too overengineered but I don't care
 
                             float space_without_text = (ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("x").x - ImGui::CalcTextSize("@").x - ImGui::GetStyle().ItemSpacing.x * 4) / 3;
                             float integ;
@@ -501,7 +492,7 @@ namespace uv::gui {
 
                             ImGui::Spacing();
 
-                            ImGui::PushItemWidth(-ImGui::CalcTextSize("Custom Options?").x - ImGui::GetStyle().WindowPadding.x - ImGui::GetStyle().ItemSpacing.x); // The longest of them all
+                            ImGui::PushItemWidth(-ImGui::CalcTextSize("Custom Options?").x - ImGui::GetStyle().WindowPadding.x - ImGui::GetStyle().ItemSpacing.x);
 
                             ImGui::InputText("Bitrate", &render_opts.bitrate);
                             ImGui::SameLine();
@@ -552,7 +543,6 @@ namespace uv::gui {
 
                             space_without_text = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 3) / 4;
 
-                            // Thanks toby for bitrate values
                             
                             ImGui::SeparatorText("Presets");
                             
@@ -789,7 +779,7 @@ namespace uv::gui {
 #else
                 ImGui::SeparatorText("Menu Button");
                 ImGui::PushTextWrapPos(0.0f);
-                ImGui::Text("Tap the uv button in the top right corner while playing or on the pause menu to open or close this menu.");
+                ImGui::Text("Tap the uv button in the top right corner of the pause menu to open or close this menu.");
                 ImGui::PopTextWrapPos();
 
                 ImGui::SeparatorText("Frame Stepper");
@@ -847,7 +837,6 @@ namespace uv::gui {
         if (animating) {
             float alpha_value = (std::chrono::steady_clock::now() - toggle_time).count() / static_cast<float>(animation_duration.count());
             if (!show) alpha_value = 1.0f - alpha_value;
-            // Apply Cubic InOut easing
             float intermediate = (-2 * alpha_value) + 2;
             alpha_value = alpha_value < 0.5f ? 4 * alpha_value * alpha_value * alpha_value : 1 - (intermediate * intermediate * intermediate) / 2;
             ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha_value);
@@ -946,18 +935,6 @@ namespace uv::gui {
         return menu;
     }
 }
-
-class $modify(UVUILayer, UILayer) {
-    bool init(GJBaseGameLayer *p0) {
-        if (!UILayer::init(p0)) return false;
-        uv::gui::make_menu_button(this, this, menu_selector(UVUILayer::on_uv));
-        return true;
-    }
-
-    void on_uv(cocos2d::CCObject*) {
-        uv::gui::toggle_menu();
-    }
-};
 
 class $modify(UVPauseLayer, PauseLayer) {
     void customSetup(void) {
