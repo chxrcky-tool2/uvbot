@@ -1,3 +1,4 @@
+# Paused repository!
 Note! This is a fork of uvBot, specifically targeting Geode SDK v6.0.0-alpha.1 and Geometry Dash 2.2091. Compiled on a
 mobile phone, Android64.
 
